@@ -1,4 +1,7 @@
 <?php
+/**
+ * @author: Norman Albusberger
+ */
 namespace WasabiMail;
 
 use Zend\ModuleManager\Feature\AutoloaderProviderInterface;

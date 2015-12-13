@@ -24,7 +24,8 @@ You can change this behavior in the Module.php if necessary.
 Using a template for sending emails is based on the ViewModel approach of ZF2. You only need to create a new
 ZF2 *ViewModel* instance, set your template, fill in your variables and pass it to the setBody method of the Mail Module.
 
-**WasabiMail is bundeled with a responsive Html Email-Template that you can customize for your own needs.**
+**WasabiMail is bundled with a *responsive* Html Email-Template that you can customize for your own needs.**
+This template is tested with common email clients like Microsoft Outlook or Google Mail.
     
     $mail = $this->getServiceLocator()->get("Mail");
     $viewModel = new ViewModel();

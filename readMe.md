@@ -30,6 +30,8 @@ This template is tested with common email clients like Microsoft Outlook or Goog
     $mail = $this->getServiceLocator()->get("Mail");
     $viewModel = new ViewModel();
     $viewModel->setTemplate("responsive");
+    $mail->setBody($viewModel);
+    $mail->send();
 
 The template path stack is set to WasabiMail/templates. If necessary you can change this in the config.php 
 

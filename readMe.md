@@ -1,4 +1,4 @@
-Wasabi Mail Module
+Wasabi Mail Module for Zend Framework 2
 =======================================================
 
 #Configuration

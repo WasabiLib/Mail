@@ -20,7 +20,7 @@ You can change this behavior in the Module.php if necessary.
     $mail->setTo("recipient@domain.com");
     $mail->send();
 
-##Using an Html Template
+##Using  Html Templates
 Using a template for sending emails is based on the ViewModel approach of ZF2. You only need to create a new
 ZF2 *ViewModel* instance, set your template, fill in your variables and pass it to the setBody method of the Mail Module.
 

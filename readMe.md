@@ -11,6 +11,16 @@ You have 3 default *env*-types for configuration in vendor/WasabiMail/config.php
 
 You can change this behavior in the Module.php if necessary.
 
+##Setting the Environment type
+It is recommended to set the *env*-type in the local.php of the config-folder. Normaly this file will not be deployed and should differ from the specific server environment. 
+
+###Copy the following code into the local.php
+     "env" => array(
+         "type" => "local"
+        #"type" => "develop"
+        #"type" => "production"
+     ),
+ Make sure that only one type is active.
 
 #Examples
 

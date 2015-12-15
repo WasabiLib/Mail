@@ -1,0 +1,15 @@
+{
+    "name": "WasabiLib/Mail",
+    "type": "library",
+    "description": "ZF2 Email Module Service",
+    "keywords": ["ZF2", "Mail", "Email", "ZF2 mail service", "wasabilib"],
+    "homepage": "https://github.com/WasabiLib/Mail",
+    "license": "MIT License",
+    "authors": [
+        {
+            "name": "Norman Albusberger",
+            "email": "norman@wasabilib.org",
+            "homepage": "http://wasabilib.org/"
+        }
+    ]
+}

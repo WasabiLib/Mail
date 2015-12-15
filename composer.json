@@ -1,9 +1,9 @@
 {
-    "name": "WasabiLib/Mail",
+    "name": "wasabilib/mail",
     "type": "library",
     "description": "ZF2 Email Module Service",
     "keywords": ["ZF2", "Mail", "Email", "ZF2 mail service", "wasabilib"],
-    "homepage": "https://github.com/WasabiLib/Mail",
+    "homepage": "https://github.com/wasabiLib/mail",
     "license": "MIT License",
     "authors": [
         {

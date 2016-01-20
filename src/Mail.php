@@ -6,27 +6,29 @@
 
 namespace WasabiMail;
 
+use Doctrine\Instantiator\Exception\InvalidArgumentException;
 use Zend\Http\Response;
 use Zend\Mail\Message;
 use Zend\Mail\Header\ContentType;
+use Zend\View\Model\ViewModel;
 use Zend\View\Renderer\RendererInterface;
 use Zend\View\Strategy\PhpRendererStrategy;
 use Zend\View\View;
+use Zend\Mime;
 
-class Mail {
+class Mail{
 
     /**
      * @var Message
      */
     protected $message;
 
-    const MESSAGETYPEPLAINTEXT = "text";
-    const MESSAGETYPEHTML = "html";
-
     protected $messageType = "text";
-    protected $body = null;
     protected $renderer = null;
     protected $transporter = null;
+    protected $attachments = [];
+
+    const DEFAULT_CHARSET = 'utf-8';
 
     /**
      * @param string $from
@@ -34,20 +36,62 @@ class Mail {
      * @param string | \Zend\View\Model\ViewModel $body
      * @param \Zend\View\Renderer\RendererInterface $renderer
      */
-    public function __construct($from = "", $name = "", $body = null, RendererInterface $renderer = null) {
+    public function __construct($from = "", $name = "", RendererInterface $renderer = null) {
         $this->message = new Message();
-        $this->message->setEncoding("UTF-8");
+        $this->message->setEncoding(self::DEFAULT_CHARSET);
         if($from) $this->message->setFrom($from, $name);
-        $this->body = $body;
         $this->renderer = $renderer;
 
     }
 
     /**
-     * @param string | \Zend\View\Model\ViewModel $body
+     * @param string | \Zend\View\Model\ViewModel | Mime\Part $body
+     * @return $this
      */
-    public function setBody($body) {
-        $this->body = $body;
+    public function setBody($body, $charset = null){
+        $mimeMessage = new Mime\Message();
+        $finalBody = null;
+        if (is_string($body)) {
+            // Create a Mime\Part and wrap it into a Mime\Message
+            $mimePart = new Mime\Part($body);
+            $mimePart->type     = $body != strip_tags($body) ? Mime\Mime::TYPE_HTML : Mime\Mime::TYPE_TEXT;
+            $mimePart->charset  = $charset ?: self::DEFAULT_CHARSET;
+            $mimeMessage->setParts([$mimePart]);
+            $finalBody = $mimeMessage;
+
+        } elseif ($body instanceof Mime\Part) {
+            // Overwrite the charset if the Part object if provided
+            if (isset($charset)) {
+                $body->charset = $charset;
+            }
+            // The body is a Mime\Part. Wrap it into a Mime\Message
+            $mimeMessage->setParts([$body]);
+            $finalBody = $mimeMessage;
+
+        } elseif($body instanceof ViewModel){
+            $view = new View();
+            $view->setResponse(new Response());
+
+            $view->getEventManager()->attach(new PhpRendererStrategy($this->renderer));
+
+            $view->render($body);
+
+            $finalBody = $view->getResponse()->getContent();
+        }
+        // If the body is not a string or a Mime\Message at this point, it is not a valid argument
+       else {
+            throw new InvalidArgumentException(sprintf(
+                'Provided body is not valid. It should be one of "%s". %s provided',
+                implode('", "', ['string', 'Zend\Mime\Part', 'Zend\Mime\Message']),
+                is_object($body) ? get_class($body) : gettype($body)
+            ));
+        }
+        // The headers Content-type and Content-transfer-encoding are duplicated every time the body is set.
+        // Removing them before setting the body prevents this error
+        $this->message->getHeaders()->removeHeader('contenttype');
+        $this->message->getHeaders()->removeHeader('contenttransferencoding');
+        $this->message->setBody($finalBody);
+        return $this;
     }
 
     /**
@@ -132,39 +176,58 @@ class Mail {
      * Sends the email.
      */
     public function send() {
-        $this->prepare();
-
-        if ($this->messageType == self::MESSAGETYPEHTML) {
-            $type = new ContentType();
-            $type->setType('text/html');
-            $this->message->getHeaders()->addHeader($type);
-        }
-        else{
-            $textType = new ContentType();
-            $textType->setType("text/plain");
-            $this->message->getHeaders()->addHeader($textType);
-        }
-
+        $this->attachFiles();
         $this->transporter->send($this->message);
     }
 
-    /**
-     * Prepares the email for the sending.
-     */
-    protected function prepare(){
-        if(is_a($this->body, "Zend\\View\\Model\\ViewModel")) {
-            $view = new View();
-            $view->setResponse(new Response());
-
-            $view->getEventManager()->attach(new PhpRendererStrategy($this->renderer));
-
-            $view->render($this->body);
-
-            $this->message->setBody($view->getResponse()->getContent());
-            $this->messageType = "html";
+    public function addAttachment($path, $filename = null){
+        if (isset($filename)) {
+            $this->attachments[$filename] = $path;
         } else {
-            $this->message->setBody($this->body);
-            $this->messageType = "text";
+            $this->attachments[] = $path;
         }
+        return $this;
     }
+
+    /**
+     * Attaches files to the message if any
+     */
+    private function attachFiles(){
+        if (count($this->attachments) === 0) {
+            return;
+        }
+        // Get old message parts
+        $mimeMessage = $this->message->getBody();
+        if (is_string($mimeMessage)) {
+            $originalBodyPart = new Mime\Part($mimeMessage);
+            $originalBodyPart->type = $mimeMessage != strip_tags($mimeMessage)
+                ? Mime\Mime::TYPE_HTML
+                : Mime\Mime::TYPE_TEXT;
+            // A Mime\Part body will be wraped into a Mime\Message, ensuring we handle a Mime\Message after this point
+            $this->setBody($originalBodyPart);
+            $mimeMessage = $this->message->getBody();;
+        }
+        $oldParts = $mimeMessage->getParts();
+        // Generate a new Mime\Part for each attachment
+        $attachmentParts    = [];
+        $info               = new \finfo(FILEINFO_MIME_TYPE);
+        foreach ($this->attachments as $key => $attachment) {
+            if (! is_file($attachment)) {
+                continue; // If checked file is not valid, continue to the next
+            }
+            // If the key is a string, use it as the attachment name
+            $basename = is_string($key) ? $key : basename($attachment);
+            $part               = new Mime\Part(fopen($attachment, 'r'));
+            $part->id           = $basename;
+            $part->filename     = $basename;
+            $part->type         = $info->file($attachment);
+            $part->encoding     = Mime\Mime::ENCODING_BASE64;
+            $part->disposition  = Mime\Mime::DISPOSITION_ATTACHMENT;
+            $attachmentParts[]  = $part;
+        }
+        $body = new Mime\Message();
+        $body->setParts(array_merge($oldParts, $attachmentParts));
+        $this->message->setBody($body);
+    }
+
 }

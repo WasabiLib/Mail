@@ -1,10 +1,25 @@
 {
-    "name": "wasabilib/mail",
+    "name": "WasabiLib/Mail",
     "type": "library",
-    "description": "ZF2 Email Module Service",
-    "keywords": ["ZF2", "Mail", "Email", "ZF2 mail service", "wasabilib"],
+    "description": "Zend Framework 2 Email Module Service",
+    "keywords": ["zf2", "email", "zf2 mail service", "wasabilib", "zend","module","php"],
     "homepage": "https://github.com/wasabiLib/mail",
     "license": "MIT License",
+    "require" : {
+        "php" : "~5.4|~7.0",
+        "zendframework/zend-servicemanager": "~2.2",
+        "zendframework/zend-mail": "~2.2",
+        "zendframework/zend-view": "~2.2",
+        "zendframework/zend-eventmanager": "~2.2",
+        "zendframework/zend-mime": "~2.2",
+        "zendframework/zend-stdlib": "~2.2",
+        "zendframework/zend-modulemanager": "~2.2",
+        "zendframework/zend-mvc": "~2.2",
+        "zendframework/zend-console": "~2.2",
+        "zendframework/zend-config": "~2.2",
+        "zendframework/zend-json": "~2.2"
+    },
+    
     "authors": [
         {
             "name": "Norman Albusberger",

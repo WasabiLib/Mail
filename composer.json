@@ -1,5 +1,5 @@
 {
-    "name": "WasabiLib/Mail",
+    "name": "wasabi/wasabiMail",
     "type": "library",
     "description": "Zend Framework 2 Email Module Service",
     "keywords": ["zf2", "email", "zf2 mail service", "wasabilib", "zend","module","php"],

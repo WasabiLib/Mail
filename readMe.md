@@ -1,6 +1,6 @@
 Wasabi Mail Module for Zend Framework 2
 =======================================================
-This Email module enhances ZF2 email functionality for a convinient usage. It supports file attachments and template email composition.
+This Email module enhances ZF2 email functionality for a convenient usage. It supports file attachments and template email composition.
 
 #Configuration
 The Mail Module is configured as a service and registered to the service manager.

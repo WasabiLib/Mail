@@ -21,12 +21,21 @@ return array(
 
             /**
              * you have a staging or development system with access to a mail server
+             * For detailed information of smtp options see: http://framework.zend.com/manual/current/en/modules/zend.mail.smtp.options.html
              */
             "develop" => array(
                 "port" => 25,
-                "to" => "development@yourdomain.de",
+                "to" => "development-mails@yourdomain.de",
                 "name" => "mail.yourmailserver.local",
                 "host" =>"mail.yourmailserver.local",),
+
+                //comment the following lines if they are not needed for your setup
+                'connection_class'  => 'login', //'crammd5' or 'plain'
+                'connection_config' => array(
+                    'username' => 'user',
+                    'password' => 'pass',
+                    'ssl'      => 'tls',
+            ),
         ),
     ),
     /**

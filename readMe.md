@@ -1,5 +1,7 @@
 Wasabi Mail Module for Zend Framework 2
 =======================================================
+[![Latest Stable Version](https://poser.pugx.org/wasabi/wasabimail/v/stable)](https://packagist.org/packages/wasabi/wasabimail) [![Total Downloads](https://poser.pugx.org/wasabi/wasabimail/downloads)](https://packagist.org/packages/wasabi/wasabimail) [![Latest Unstable Version](https://poser.pugx.org/wasabi/wasabimail/v/unstable)](https://packagist.org/packages/wasabi/wasabimail) [![License](https://poser.pugx.org/wasabi/wasabimail/license)](https://packagist.org/packages/wasabi/wasabimail)
+
 This Email module enhances ZF2 email functionality for a convenient usage. It supports file attachments and template email composition.
 
 #Configuration

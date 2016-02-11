@@ -30,14 +30,15 @@ SOFTWARE.
 
 namespace WasabiMail;
 
-use Zend\Mail\Exception\InvalidArgumentException;
 use Zend\Http\Response;
 use Zend\Mail\Message;
+use Zend\Mail\Header\ContentType;
 use Zend\View\Model\ViewModel;
 use Zend\View\Renderer\RendererInterface;
 use Zend\View\Strategy\PhpRendererStrategy;
 use Zend\View\View;
 use Zend\Mime;
+use Zend\Mail\Exception\InvalidArgumentException;
 
 class Mail{
 
@@ -56,6 +57,7 @@ class Mail{
     /**
      * @param string $from
      * @param string $name
+     * @param string | \Zend\View\Model\ViewModel $body
      * @param \Zend\View\Renderer\RendererInterface $renderer
      */
     public function __construct($from = "", $name = "", RendererInterface $renderer = null) {
@@ -68,7 +70,7 @@ class Mail{
 
     /**
      * @param string | \Zend\View\Model\ViewModel | Mime\Part $body
-     * @return Mail
+     * @return $this
      */
     public function setBody($body, $charset = null){
         $mimeMessage = new Mime\Message();
@@ -98,7 +100,13 @@ class Mail{
 
             $view->render($body);
 
-            $finalBody = $view->getResponse()->getContent();
+            $content = $view->getResponse()->getContent();
+
+            $mimePart = new Mime\Part($content);
+            $mimePart->type  =  Mime\Mime::TYPE_HTML;
+            $mimePart->charset  = $charset ?: self::DEFAULT_CHARSET;
+            $mimeMessage->setParts([$mimePart]);
+            $finalBody = $mimeMessage;
         }
         // If the body is not a string or a Mime\Message at this point, it is not a valid argument
        else {
@@ -119,74 +127,58 @@ class Mail{
     /**
      * @param string $from
      * @param string $name
-     * @return Mail
      */
     public function setFrom($from,$name = null){
         $this->message->setFrom($from,$name);
-        return $this;
     }
 
     /**
      * @param string $subject
-     * @return Mail
      */
     public function setSubject($subject) {
         $this->message->setSubject($subject);
-        return $this;
     }
 
     /**
      * @param string $emailAddress
-     * @return Mail
      */
     public function setTo($emailAddress) {
         $this->message->setTo($emailAddress);
-        return $this;
     }
 
     /**
      * @param string $emailAddress
-     * @return Mail
      */
     public function addRecipient($emailAddress) {
         $this->message->addTo($emailAddress);
-        return $this;
     }
 
     /**
      * @param string $emailAddress
-     * @return Mail
      */
     public function addBccRecipient($emailAddress) {
         $this->message->addBcc($emailAddress);
-        return $this;
     }
 
     /**
      * @param string $emailAddress
-     * @return Mail
      */
     public function addCcRecipient($emailAddress) {
         $this->message->addCc($emailAddress);
-        return $this;
     }
 
     /**
      * @param string $abstractConst
-     * @return Mail
      */
     protected function setMessageType($abstractConst) {
         $this->messageType = $abstractConst;
-        return $this;
     }
 
     /**
      * @param mixed $transporter
-     * @return Mail
      */
     public function setTransporter($transporter) {
         $this->transporter = $transporter;
-        return $this;
     }
 
     /**
@@ -198,11 +190,9 @@ class Mail{
 
     /**
      * @param null|\Zend\View\Renderer\RendererInterface $renderer
-     * @return Mail
      */
     public function setRenderer(RendererInterface $renderer) {
         $this->renderer = $renderer;
-        return $this;
     }
 
     /**

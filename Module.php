@@ -29,7 +29,7 @@ SOFTWARE.
  */
 
 namespace WasabiMail;
-
+use Zend\Mail\Transport\Sendmail;
 use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
 use Zend\ModuleManager\Feature\ViewHelperProviderInterface;
 

@@ -4,7 +4,7 @@ Wasabi Mail Module for Zend Framework 2
 
 This Email module enhances ZF2 email functionality for a convenient usage. It supports file attachments and template email composition.
 
-#Configuration
+# Configuration
 The Mail Module is configured as a service and registered to the service manager.
 You have 3 default *env*-types for configuration in vendor/WasabiMail/config.php:
  
@@ -14,10 +14,10 @@ You have 3 default *env*-types for configuration in vendor/WasabiMail/config.php
 
 You can change this behavior in the Module.php if necessary.
 
-##Setting the Environment type
+## Setting the Environment type
 It is recommended to set the *env*-type in the local.php of the config-folder. Normaly this file will not be deployed and should differ from the specific server environment. 
 
-###Copy the following code into the local.php
+### Copy the following code into the local.php
      "env" => array(
          "type" => "local"
         #"type" => "develop"
@@ -25,15 +25,15 @@ It is recommended to set the *env*-type in the local.php of the config-folder. N
      ),
  Make sure that only one type is active.
 
-#Examples
+# Examples
 
-##Simple Usage
+## Simple Usage
     $mail = $this->getServiceLocator()->get("Mail");
     $mail->setBody("Hello World");
     $mail->setTo("recipient@domain.com");
     $mail->send();
 
-##Using  Html Templates
+## Using  Html Templates
 Using a template for sending emails is based on the ViewModel approach of ZF2. You only need to create a new
 ZF2 *ViewModel* instance, set your template, fill in your variables and pass it to the setBody method of the Mail Module.
 
@@ -53,7 +53,7 @@ The template path stack is set to WasabiMail/templates. If necessary you can cha
 
 Files can be attached to the email before sending it by providing their paths with `addAttachment` the method.
 
-###Usage
+### Usage
 
     $mail->addAttachment('data/mail/attachments/file1.pdf');
 
